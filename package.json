@@ -1,0 +1,22 @@
+{
+  "name": "comp484-calendar",
+  "version": "1.0.0",
+  "description": "This is a basic HTML starter project you can build on however you like. No need to save. While you develop your site, your changes will happen ✨ immediately in the preview window. On the left you'll see the files that make up your site, including HTML, JavaScript, and CSS. You can upload assets like images or audio in `assets`. The rest is up to you and your imagination. 🦄",
+  "main": "main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rfilkin/comp484-calendar.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/rfilkin/comp484-calendar/issues"
+  },
+  "homepage": "https://github.com/rfilkin/comp484-calendar#readme",
+  "dependencies": {
+    "firebase": "^9.6.0"
+  }
+}
