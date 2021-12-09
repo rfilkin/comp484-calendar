@@ -1,36 +1,37 @@
 <template>
-<div class="login">
-   <h1> Login </h1>
-   <form @submit.prevent="Login">
+<div class="register">
+    <h1> Register </h1>
+    <form @submit.prevent="Register">
         <input type="text" placeholder="Email" v-model="email"/>
         <input type="password" placeholder="Password" v-model="password"/>
-        <input type="submit" value="Login" >
-        <p>Need an account? <router-link to="/register">Register Here</
+        <input type="submit" value="Regsiter" >
+        <p>Have an account? <router-link to="/login">Login Here</
         router-link></p>
-    </form>    
+    </form>
 </div>
 </template>
 
 <script>
-import {ref} from 'vue';
 import firebase from 'firebase';
-
+import {ref} from 'vuw';
 
 export default{
     setup(){
         const email = ref("");
         const password = ref("");
 
-        const Login = () =>{
-            firebase 
+        const Register = () => {
+            firebases 
                 .auth()
-                .signInWithEmailAndPassword(email.value,password.value)
-                .then(data => console.log(data))
+                .createUserWithEmailAndPassword(email.value,password.value)
+                .then(user =>{
+                    alert(user);
+                })
                 .catch(err => alert(err.message));
         }
 
         return{
-            Login,
+            Register,
             email,
             password
         }
@@ -38,6 +39,3 @@ export default{
 }
 </script>
 
-<style>
-
-</style>
