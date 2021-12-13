@@ -3,7 +3,7 @@
 </template>
 
 <script>
-import{oneBeforeMount} from 'vue';
+import{onBeforeMount} from 'vue';
 import {useRouter, useRoute} from 'vue-router';
 import firebase from 'firebase';
 
@@ -12,12 +12,12 @@ setup(){
   const router = useRouter();
   const route = useRoute();
 
-  oneBeforeMount(() => {
+  onBeforeMount(() => {
     firebase.auth().onAuthStateChanged((user) => {
       if(!user){
         router.replace('/login');
       }else if (route.path == "/login" || route.path == "/register"){
-        riouter.replace('/');
+        router.replace('/');
       }
     });
   });

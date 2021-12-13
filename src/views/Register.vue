@@ -5,15 +5,14 @@
         <input type="text" placeholder="Email" v-model="email"/>
         <input type="password" placeholder="Password" v-model="password"/>
         <input type="submit" value="Regsiter" >
-        <p>Have an account? <router-link to="/login">Login Here</
-        router-link></p>
+        <p>Have an account? <router-link to="/login">Login Here</router-link></p>
     </form>
 </div>
 </template>
 
 <script>
 import firebase from 'firebase';
-import {ref} from 'vuw';
+import {ref} from 'vue';
 
 export default{
     setup(){
@@ -21,7 +20,7 @@ export default{
         const password = ref("");
 
         const Register = () => {
-            firebases 
+            firebase 
                 .auth()
                 .createUserWithEmailAndPassword(email.value,password.value)
                 .then(user =>{
