@@ -211,8 +211,8 @@ export default {
             :msg = "message"
             @noteTitleChanged = "noteTitle = $event"
             @messageChanged = "message = $event"
-          />
-          <Navbar
+      />
+      <Navbar
       v-if="isModalVisible == false"
        />
       <div class='demo-app-main'>
