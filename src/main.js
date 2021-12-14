@@ -5,6 +5,7 @@ import firebase from 'firebase'
 
 // Calendar page
 import './main.css'
+// need to fix font-awesome error, commented out for now
 /*
 import { library } from '@fortawesome/fontawesome-svg-core'
 import { faTrash } from '@fortawesome/free-solid-svg-icons'
