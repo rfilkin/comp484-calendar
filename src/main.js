@@ -3,6 +3,22 @@ import App from './App.vue'
 import router from './router'
 import firebase from 'firebase'
 
+// Calendar page
+import './main.css'
+/*
+import { library } from '@fortawesome/fontawesome-svg-core'
+import { faTrash } from '@fortawesome/free-solid-svg-icons'
+import { faSignOutAlt } from '@fortawesome/free-solid-svg-icons'
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
+library.add(faTrash)
+library.add(faSignOutAlt)
+
+
+createApp(App).component("font-awesome-icon", FontAwesomeIcon);
+
+
+*/
+// Calendar End
 const firebaseConfig = {
   apiKey: "AIzaSyCWY7G0MgW3oG1JYgeRWidIwUdlOEkCiB0",
   authDomain: "calendarapp-2d231.firebaseapp.com",
