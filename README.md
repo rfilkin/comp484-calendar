@@ -64,4 +64,3 @@ https://www.digitalocean.com/community/tutorials/vuejs-vue-modal-component
 
 For passing props between components
 https://www.youtube.com/watch?v=PPmg7ntQjzc
->>>>>>> main
