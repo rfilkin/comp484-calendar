@@ -17,7 +17,7 @@
           if(!user){
             router.replace('/login'); //redirects user to login, if they are NOT logged in
           }else if (route.path == "/login" || route.path == "/register"){
-            router.replace('/'); //redirects user away from login or register, if they are already logged in
+            router.replace('/calendar'); //redirects user to calendar, if they are already logged in
           }
         });
       });

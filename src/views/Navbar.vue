@@ -1,9 +1,9 @@
 <template>
     <div class = "navbar">
-        <h1 class = "welcomeMessage">Welcome, Jimmy De Santa</h1>
+        <h1 class = "welcomeMessage">Welcome, {{ name }}</h1>
         <button class = "logout"
             type="button"
-            @click="close"                
+            @click="Logout"                
             aria-label="Log out button"
           >
           Logout
@@ -13,6 +13,11 @@
 </template>
 
 <script>
+
+// code for login stuff
+  import { ref, onBeforeMount } from 'vue';
+  import firebase from 'firebase';
+
   export default {
     name: 'Navbar',
      methods: {
@@ -20,9 +25,32 @@
         this.$emit('close');
       },
     },
-  };
+    setup() {
+      const name = ref("");
 
+      onBeforeMount(() => {
+        const user = firebase.auth().currentUser; //if someone is logged in, what is their username?
+        if (user) {//if user exists...
+          name.value = user.email.split('@')[0]; //split at the @ sign, and return first item in that list (the item before the @)
+        }
+      });
+
+      const Logout = () => {
+        firebase
+          .auth()
+          .signOut()
+          .then(() => console.log("Signed out."))
+          .catch(err => alert(err.message));
+      }
+
+      return {
+          name,
+          Logout
+      }
+    }
+  }
 </script>
+
 
 
 <style>

@@ -1,3 +1,17 @@
 {
-  "events": []
+  "events": [
+    {
+      "event": {
+        "start": "2021-12-14",
+        "end": "2021-12-15",
+        "id": "1",
+        "extendedProps": {
+          "text": "Do the thing"
+        },
+        "title": "eventname1"
+      },
+      "relatedEvents": [],
+      "id": 1
+    }
+  ]
 }
