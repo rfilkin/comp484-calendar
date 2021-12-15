@@ -33,6 +33,8 @@ See [Configuration Reference](https://cli.vuejs.org/config/).
 Starter template for calendar page
 https://github.com/fullcalendar/fullcalendar-example-projects/tree/master/vue
 
+Tutorial on vue.js and CRUD operations with JSON server https://www.youtube.com/watch?v=qZXt1Aom3Cs
+
 Tutorial on fullcalendar and vuejs
 https://www.youtube.com/watch?v=A-ESlbM-XzE&t=78s 
 
