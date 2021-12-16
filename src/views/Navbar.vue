@@ -7,7 +7,7 @@
             aria-label="Log out button"
           >
           Logout
-            <font-awesome-icon icon = "sign-out-alt" /> 
+            <i class="fas fa-sign-out-alt"></i>
           </button>
     </div>
 </template>
@@ -27,7 +27,7 @@
     },
     setup() {
       const name = ref("");
-
+      
       onBeforeMount(() => {
         const user = firebase.auth().currentUser; //if someone is logged in, what is their username?
         if (user) {//if user exists...

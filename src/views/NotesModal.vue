@@ -21,7 +21,7 @@
             @click="deleteEvent"
             aria-label="Delete modal"
           >
-            <font-awesome-icon icon = "trash" />
+            <i class="fas fa-trash-alt"></i>
           </button>
         </header>
 

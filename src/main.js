@@ -6,27 +6,20 @@ import firebase from 'firebase'
 // Calendar page
 import './main.css'
 // need to fix font-awesome error, commented out for now
-/*
+
 import { library } from '@fortawesome/fontawesome-svg-core'
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import { faTrash } from '@fortawesome/free-solid-svg-icons'
 import { faSignOutAlt } from '@fortawesome/free-solid-svg-icons'
-import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 
 library.add(faTrash)
 library.add(faSignOutAlt)
-
-Vue.component('font-awesome-icon', FontAwesomeIcon)
-
-require("regenerator-runtime/runtime");
-
-library.add(faTrash)
-library.add(faSignOutAlt)
-
 
 createApp(App).component("font-awesome-icon", FontAwesomeIcon);
 
 
-*/
+
+
 // Calendar End
 const firebaseConfig = {
   apiKey: "AIzaSyCWY7G0MgW3oG1JYgeRWidIwUdlOEkCiB0",
