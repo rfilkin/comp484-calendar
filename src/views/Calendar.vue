@@ -4,12 +4,47 @@ import dayGridPlugin from '@fullcalendar/daygrid'
 import timeGridPlugin from '@fullcalendar/timegrid'
 import interactionPlugin from '@fullcalendar/interaction'
 import listPlugin from '@fullcalendar/list'
+import firebase from 'firebase'
 
 import NotesModal from '../views/NotesModal.vue'
 import Navbar from '../views/Navbar.vue'
+import { onUnmounted, ref } from '@vue/runtime-core'
 let main;
 let idNum = 1;
 var clickData;
+
+//firebase db
+const db = firebase.firestore();
+const eventCollection = db.collection("CalendarEvents");
+
+export const createEvent = event => {
+  return eventCollection.add(event);
+}
+
+export const getEvent = async id => {
+  const event = await eventCollection.doc(id).get();
+  return event.exists ? event.data() : null;
+}
+
+export const updateEvent = (id, event) => {
+  return eventCollection.doc(id).update(event);
+}
+
+export const deleteEvent = id => {
+  return eventCollection.doc(id).delete();
+}
+
+export const useLoadEvents = () => {
+  const events = ref([]);
+  const close = eventCollection.onSnapshot(snapshot => {
+    events.value = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }))
+  })
+  onUnmounted(close)
+  return events;
+}
+
+
+//calendar stuff
 export default {
 
   components: {
@@ -74,6 +109,12 @@ export default {
         allDay: selectInfo.allDay,
         text
       })
+      //firebase
+      // createEvent({
+      //   id: idNum,
+      //   name: title,
+      //   text
+      // })
       this.dateInfo = selectInfo.startStr + " to " + selectInfo.endStr;
     },
 

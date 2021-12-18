@@ -1,5 +1,4 @@
 import { createRouter, createWebHistory } from 'vue-router'
-//import { component } from 'vue/types/umd'
 import Home from '../views/Home.vue'
 
 const routes = [
@@ -14,7 +13,6 @@ const routes = [
    
     component: () => import( '../views/About.vue')
   },
-
   {
     path: '/login',
     name: 'Login',
