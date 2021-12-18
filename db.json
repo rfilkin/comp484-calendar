@@ -1,3 +1,30 @@
 {
-  "events": []
+  "events": [
+    {
+      "event": {
+        "start": "2021-12-18",
+        "end": "2021-12-19",
+        "id": "1",
+        "extendedProps": {
+          "text": "dsfsdsdgfdss"
+        },
+        "title": "eventname4"
+      },
+      "relatedEvents": [],
+      "id": 1
+    },
+    {
+      "event": {
+        "start": "2021-12-17",
+        "end": "2021-12-18",
+        "id": "2",
+        "extendedProps": {
+          "text": "dsfsdfsdfs"
+        },
+        "title": "eventname4"
+      },
+      "relatedEvents": [],
+      "id": 2
+    }
+  ]
 }

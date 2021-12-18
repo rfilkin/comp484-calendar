@@ -15,7 +15,7 @@ var clickData;
 
 //firebase db
 const db = firebase.firestore();
-const eventCollection = db.collection("CalendarEvents");
+const eventCollection = db.collection("CalendarEvents"); //our data will be saved into this firebase collection
 
 export const createEvent = event => {
   return eventCollection.add(event);
@@ -39,7 +39,8 @@ export const useLoadEvents = () => {
   const close = eventCollection.onSnapshot(snapshot => {
     events.value = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }))
   })
-  onUnmounted(close)
+  onUnmounted(close);
+  //console.log("useLoadEvents result: ", events.data());
   return events;
 }
 
@@ -109,11 +110,14 @@ export default {
         allDay: selectInfo.allDay,
         text
       })
-      //firebase
+      // //firebase
       // createEvent({
       //   id: idNum,
-      //   name: title,
-      //   text
+      //   title: title,
+      //   start: selectInfo.startStr,
+      //   end: selectInfo.endStr,
+      //   allDay: selectInfo.allDay,
+      //   text: text
       // })
       this.dateInfo = selectInfo.startStr + " to " + selectInfo.endStr;
     },
@@ -143,6 +147,9 @@ export default {
       res.status === 200 ? 
       (this.events = this.events.filter((event) => event.id !== id)) :
       alert('Error deleting event')
+
+      //firebase
+      deleteEvent(id);
     },
 
     handleEvents(events) {
@@ -159,6 +166,8 @@ export default {
       })
       const data = await res.json()
       this.events = [...this.events, data]
+      //firebase
+      await createEvent(event);
     },
 
     async updateEventToDB(clickInfo){
@@ -169,20 +178,29 @@ export default {
         },
         body: JSON.stringify(clickInfo)
       })
+
+      console.log("clickinfo of event", clickInfo.event);
+      
+      //firebase
+      await updateEvent(clickInfo.id, clickInfo.event);
+
       const data = await res.json()
       this.events = [...this.events, data]
+
+      
     },
 
     // make modal visible
     async showModal() {
       this.isModalVisible = true;
       let data;
-      data = await this.getEvents();
+      data = await this.getEvents(); //query events from the json database
+
       let i;
-      for (i = 0; i < data.length; i++)
+      for (i = 0; i < data.length; i++) //for every event
       {
-        if (data[i].id == clickData.event.id){
-          this.noteTitle = data[i].title;
+        if (data[i].id == clickData.event.id){ //if the event matches the one we just clicked
+          this.noteTitle = data[i].title; //display the current data of that event in the modal
           this.message = data[i].extendedProps.text;
           this.dateInfo =  data[i].start + " to " + data[i].end;
         }
@@ -194,44 +212,63 @@ export default {
     async closeModal() {
       let data, i, num;
       this.isModalVisible = false;
-      data = await this.fetchEvents();
-      for (i = 0; i < data.length; i++){
-        if(data[i].id == clickData.event.id){
-          num = i;
+      data = await this.fetchEvents(); //query database for events
+
+      for (i = 0; i < data.length; i++){ //for each event
+        if(data[i].id == clickData.event.id){ //find the event we were editing
+          num = i; //save that event's index number in "data", so we can access it
         }
       }
+
+      //now we have the event's index number. Edit the event in our "data" object
       data[num].event.title = this.noteTitle;
       data[num].event.extendedProps.text = this.message;
-      this.updateEventToDB(data[num]);
+      this.updateEventToDB(data[num]); //now we send our newly-constructed object to the DB, so it replaces what we were editing.
       location.reload();        // refresh web page to show updated event title
     },
 
     async getEvents(){
-      this.events = await this.fetchEvents();
-      main = [];
-      for(let i = 0; i < this.events.length; i++){ 
-         main.push(this.events[i].event);
-         if (this.events[i].id > idNum)
+      //queries the database, ensures current ID is correct, and saves the query results into variable "events" so we can use it.
+      //then returns "events".
+      this.events = await this.fetchEvents(); //first query DB for everything
+      main = []; //temp list we will use for storing
+      for(let i = 0; i < this.events.length; i++){ //for each event...
+         main.push(this.events[i].event); //insert it into a temp list "main"
+         if (this.events[i].id > idNum) //if the event we're looking at has a higher ID than the current ID
          {
-           idNum = this.events[i].id;
+           idNum = this.events[i].id; //set current ID to the highest ID found
          }
       }
-      if (this.events.length > 0){
-        idNum++;
+      if (this.events.length > 0){ //if the total amount of events is greater than zero
+        idNum++; //increment current ID (such that it is 1 more than the highest ID found)
       }
-      this.events = main;
+      this.events = main; //save the temp list "main" into our global variable "events"
       return this.events;
     },
 
     async fetchEvents(){
+      //query DB for everything, then return it
       const res = await fetch('http://localhost:5000/events')
       const data = await res.json()
+
+      //firebase
+      const resFB = await useLoadEvents();
+      //const dataFB = await resFB.json();
+      console.log("firebase fetch all events: ", resFB);
+
       return data
     },
 
     async fetchEvent(id){
+      //query DB for only the item that has the matching ID, then return it
       const res = await fetch(`http://localhost:5000/events/${id}`)
       const data = await res.json()
+
+      //firebase
+      const resFB = await getEvent(id);
+      //const dataFB = await resFB.json();
+      console.log("firebase fetch one event: ", resFB);
+
       return data
     },
   },
