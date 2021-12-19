@@ -9,13 +9,12 @@ import firebase from 'firebase'
 import NotesModal from '../views/NotesModal.vue'
 import Navbar from '../views/Navbar.vue'
 import { onUnmounted, ref } from '@vue/runtime-core'
-let main;
-let idNum = 1;
-var clickData;
 
+var clickData;
+var user = firebase.auth().currentUser; //if someone is logged in, what is their username?
 //firebase db
 const db = firebase.firestore();
-const eventCollection = db.collection("CalendarEvents"); //our data will be saved into this firebase collection
+const eventCollection = db.collection('CalendarEvents'); //our data will be saved into this firebase collection
 
 export const createEvent = event => {
   return eventCollection.add(event);
@@ -27,11 +26,24 @@ export const getEvent = async id => {
 }
 
 export const updateEvent = (id, event) => {
+  var query = eventCollection.where('id', '==', id);
+  query.get().then(function(querySnapshot){
+    querySnapshot.forEach(function(doc){
+      doc.ref.update(event);
+    })
+  });
   return eventCollection.doc(id).update(event);
 }
 
+// add error message for not being able to delete event
 export const deleteEvent = id => {
-  return eventCollection.doc(id).delete();
+  var query = eventCollection.where('id', '==', id);
+  query.get().then(function(querySnapshot){
+    querySnapshot.forEach(function(doc){
+      doc.ref.delete();
+    })
+  });
+  return 0;
 }
 
 export const useLoadEvents = () => {
@@ -73,8 +85,7 @@ export default {
           right: 'dayGridMonth, timeGridWeek, timeGridDay, listWeek'
         },
         initialView: 'dayGridMonth',
-        //initialEvents: INITIAL_EVENTS, // alternatively, use the `events` setting to fetch from a feed
-        events: this.getEvents,
+        events: this.getAllEvents,
         editable: true,
         selectable: true,
         selectMirror: true,
@@ -84,8 +95,8 @@ export default {
         eventClick: this.handleEventClick,
         eventsSet: this.handleEvents,
         /* you can update a remote database when these fire: */
-        eventAdd: this.addEventToDB,
-        eventChange: this.updateEventToDB,         
+        //eventAdd:,
+        eventChange: this.updateEventDates,         
         //eventRemove: 
       },
       currentEvents: [],
@@ -100,26 +111,28 @@ export default {
     handleDateSelect(selectInfo) {
       let title = ''; //add input from modal component for title
       let text = '';// = this.message;// take text from NotesModal
+      let temp = eventCollection.doc().id
       let calendarApi = selectInfo.view.calendar
       calendarApi.unselect() // clear date selection
       calendarApi.addEvent({
-        id: idNum++,
+        id: temp,
         title,
         start: selectInfo.startStr,
         end: selectInfo.endStr,
         allDay: selectInfo.allDay,
-        text
+        text,
+        email: user.email
       })
-      // //firebase
-      // createEvent({
-      //   id: idNum,
-      //   title: title,
-      //   start: selectInfo.startStr,
-      //   end: selectInfo.endStr,
-      //   allDay: selectInfo.allDay,
-      //   text: text
-      // })
-      this.dateInfo = selectInfo.startStr + " to " + selectInfo.endStr;
+      //firebase
+      createEvent({
+        id: temp,
+        title,
+        start: selectInfo.startStr,
+        end: selectInfo.endStr,
+        allDay: selectInfo.allDay,
+        text,
+        email: user.email
+      })
     },
 
     // If user presses an event, call show modal function.
@@ -135,145 +148,89 @@ export default {
         clickInfo.event.remove()
         this.closeModal();
       }
-      this.deleteEventFromDB(clickInfo.event.id);
-      idNum--;
-    },
-
-    async deleteEventFromDB(id){
-      const res = await fetch(`http://localhost:5000/events/${id}`, {
-        method: 'DELETE'
-      })
-
-      res.status === 200 ? 
-      (this.events = this.events.filter((event) => event.id !== id)) :
-      alert('Error deleting event')
-
-      //firebase
-      await deleteEvent(id);
+      deleteEvent(clickInfo.event.id);
     },
 
     handleEvents(events) {
       this.currentEvents = events
     },
 
-    async addEventToDB(event) {
-      const res = await fetch('http://localhost:5000/events',{
-        method: 'POST',
-        headers: {
-          'Content-type': 'application/json',
-        },
-        body: JSON.stringify(event)
-      })
-      const data = await res.json()
-      this.events = [...this.events, data]
-      //firebase
-      await createEvent(event);
+    async updateEventDates(clickData){
+      let event = await this.getAllEvents()
+      let i = 0;
+      let temp;
+      //console.log(clickData)
+      for (; i < event.length; i++)
+      {
+        if (clickData.event.id == event[i].id)
+        {
+          event[i].start = clickData.event.startStr;
+          event[i].end = clickData.event.endStr;
+          temp = event[i]
+
+        }
+      }
+      //temp.text = this.text;
+      this.isModalVisible = false;
+
+     this.updateEventToDB(temp); //now we send our newly-constructed object to the DB, so it replaces what we were editing.
+
     },
 
     async updateEventToDB(clickInfo){
-       const res = await fetch(`http://localhost:5000/events/${clickInfo.event.id}`, {
-        method: 'PUT',
-        headers: {
-          'Content-type': 'application/json',
-        },
-        body: JSON.stringify(clickInfo)
-      })
-
-      console.log("clickinfo of event", clickInfo.event);
-      
       //firebase
-      await updateEvent(clickInfo.id, clickInfo.event);
-
-      const data = await res.json()
-      this.events = [...this.events, data]
-
-      
+      await updateEvent(clickInfo.id, clickInfo);
+      location.reload();        // refresh web page to show updated event details
     },
 
     // make modal visible
-    async showModal() {
+    // and update data that is shown in the notes modal
+    showModal() {
       this.isModalVisible = true;
-      let data;
-      data = await this.getEvents(); //query events from the json database
-
-      let i;
-      for (i = 0; i < data.length; i++) //for every event
-      {
-        if (data[i].id == clickData.event.id){ //if the event matches the one we just clicked
-          this.noteTitle = data[i].title; //display the current data of that event in the modal
-          this.message = data[i].extendedProps.text;
-          this.dateInfo =  data[i].start + " to " + data[i].end;
-        }
-      }
+      this.noteTitle = clickData.event.title
+      this.dateInfo = clickData.event.startStr + " to " + clickData.event.endStr
+      this.message = clickData.event.extendedProps.text
     },
 
     // close modal for taking notes
     // update any changes to the events from the notes modal
     async closeModal() {
-      let data, i, num;
-      this.isModalVisible = false;
-      data = await this.fetchEvents(); //query database for events
+      let i = 0;
+      let event = await this.getAllEvents()
+      let temp;
+      //console.log(event)
+      for (; i < event.length; i++)
+      {
+        //console.log(event)
+        if (clickData.event.id == event[i].id)
+        {
+          event[i].text = this.message;
+          event[i].title = this.noteTitle;
+          temp = event[i]
 
-      for (i = 0; i < data.length; i++){ //for each event
-        if(data[i].id == clickData.event.id){ //find the event we were editing
-          num = i; //save that event's index number in "data", so we can access it
         }
       }
+      //temp.text = this.text;
+      //console.log(temp)
+      this.isModalVisible = false;
 
-      //now we have the event's index number. Edit the event in our "data" object
-      data[num].event.title = this.noteTitle;
-      data[num].event.extendedProps.text = this.message;
-      this.updateEventToDB(data[num]); //now we send our newly-constructed object to the DB, so it replaces what we were editing.
-      location.reload();        // refresh web page to show updated event title
+      
+      this.updateEventToDB(temp); //now we send our newly-constructed object to the DB, so it replaces what we were editing.
     },
 
-    async getEvents(){
-      //queries the database, ensures current ID is correct, and saves the query results into variable "events" so we can use it.
-      //then returns "events".
-      this.events = await this.fetchEvents(); //first query DB for everything
-      main = []; //temp list we will use for storing
-      for(let i = 0; i < this.events.length; i++){ //for each event...
-         main.push(this.events[i].event); //insert it into a temp list "main"
-         if (this.events[i].id > idNum) //if the event we're looking at has a higher ID than the current ID
-         {
-           idNum = this.events[i].id; //set current ID to the highest ID found
-         }
+    async getAllEvents(){
+        const snapshot = await eventCollection.get()
+        this.events = snapshot.docs.map(doc => doc.data());
+        let temp = []
+        let i = 0
+        for (; i < this.events.length; i++){
+          if (this.events[i].email == user.email)
+          {
+            temp.push(this.events[i])
+          }
+        }
+        return temp;
       }
-      if (this.events.length > 0){ //if the total amount of events is greater than zero
-        idNum++; //increment current ID (such that it is 1 more than the highest ID found)
-      }
-      this.events = main; //save the temp list "main" into our global variable "events"
-      return this.events;
-    },
-
-    async fetchEvents(){
-      //query DB for everything, then return it
-      const res = await fetch('http://localhost:5000/events')
-      const data = await res.json()
-
-      //firebase
-      const resFB = await useLoadEvents();
-      //const dataFB = await resFB.json();
-      console.log("firebase fetch all events: ", resFB);
-
-      return data
-    },
-
-    async fetchEvent(id){
-      //query DB for only the item that has the matching ID, then return it
-      const res = await fetch(`http://localhost:5000/events/${id}`)
-      const data = await res.json()
-
-      //firebase
-      const resFB = await getEvent(id);
-      //const dataFB = await resFB.json();
-      console.log("firebase fetch one event: ", resFB);
-
-      return data
-    },
-  },
-  async created() {
-    this.events = await this.fetchEvents();
   },
 }
 </script>
