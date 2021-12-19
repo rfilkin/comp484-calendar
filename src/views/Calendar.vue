@@ -4,12 +4,60 @@ import dayGridPlugin from '@fullcalendar/daygrid'
 import timeGridPlugin from '@fullcalendar/timegrid'
 import interactionPlugin from '@fullcalendar/interaction'
 import listPlugin from '@fullcalendar/list'
+import firebase from 'firebase'
 
 import NotesModal from '../views/NotesModal.vue'
 import Navbar from '../views/Navbar.vue'
-let main;
-let idNum = 1;
+import { onUnmounted, ref } from '@vue/runtime-core'
+
 var clickData;
+var user = firebase.auth().currentUser; //if someone is logged in, what is their username?
+//firebase db
+const db = firebase.firestore();
+const eventCollection = db.collection('CalendarEvents'); //our data will be saved into this firebase collection
+
+export const createEvent = event => {
+  return eventCollection.add(event);
+}
+
+export const getEvent = async id => {
+  const event = await eventCollection.doc(id).get();
+  return event.exists ? event.data() : null;
+}
+
+export const updateEvent = (id, event) => {
+  var query = eventCollection.where('id', '==', id);
+  query.get().then(function(querySnapshot){
+    querySnapshot.forEach(function(doc){
+      doc.ref.update(event);
+    })
+  });
+  return eventCollection.doc(id).update(event);
+}
+
+// add error message for not being able to delete event
+export const deleteEvent = id => {
+  var query = eventCollection.where('id', '==', id);
+  query.get().then(function(querySnapshot){
+    querySnapshot.forEach(function(doc){
+      doc.ref.delete();
+    })
+  });
+  return 0;
+}
+
+export const useLoadEvents = () => {
+  const events = ref([]);
+  const close = eventCollection.onSnapshot(snapshot => {
+    events.value = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }))
+  })
+  onUnmounted(close);
+  //console.log("useLoadEvents result: ", events.data());
+  return events;
+}
+
+
+//calendar stuff
 export default {
 
   components: {
@@ -37,8 +85,7 @@ export default {
           right: 'dayGridMonth, timeGridWeek, timeGridDay, listWeek'
         },
         initialView: 'dayGridMonth',
-        //initialEvents: INITIAL_EVENTS, // alternatively, use the `events` setting to fetch from a feed
-        events: this.getEvents,
+        events: this.getAllEvents,
         editable: true,
         selectable: true,
         selectMirror: true,
@@ -48,8 +95,8 @@ export default {
         eventClick: this.handleEventClick,
         eventsSet: this.handleEvents,
         /* you can update a remote database when these fire: */
-        eventAdd: this.addEventToDB,
-        eventChange: this.updateEventToDB,         
+        //eventAdd:,
+        eventChange: this.updateEventDates,         
         //eventRemove: 
       },
       currentEvents: [],
@@ -64,17 +111,28 @@ export default {
     handleDateSelect(selectInfo) {
       let title = ''; //add input from modal component for title
       let text = '';// = this.message;// take text from NotesModal
+      let temp = eventCollection.doc().id
       let calendarApi = selectInfo.view.calendar
       calendarApi.unselect() // clear date selection
       calendarApi.addEvent({
-        id: idNum++,
+        id: temp,
         title,
         start: selectInfo.startStr,
         end: selectInfo.endStr,
         allDay: selectInfo.allDay,
-        text
+        text,
+        email: user.email
       })
-      this.dateInfo = selectInfo.startStr + " to " + selectInfo.endStr;
+      //firebase
+      createEvent({
+        id: temp,
+        title,
+        start: selectInfo.startStr,
+        end: selectInfo.endStr,
+        allDay: selectInfo.allDay,
+        text,
+        email: user.email
+      })
     },
 
     // If user presses an event, call show modal function.
@@ -90,112 +148,89 @@ export default {
         clickInfo.event.remove()
         this.closeModal();
       }
-      this.deleteEventFromDB(clickInfo.event.id);
-      idNum--;
-    },
-
-    async deleteEventFromDB(id){
-      const res = await fetch(`http://localhost:5000/events/${id}`, {
-        method: 'DELETE'
-      })
-
-      res.status === 200 ? 
-      (this.events = this.events.filter((event) => event.id !== id)) :
-      alert('Error deleting event')
+      deleteEvent(clickInfo.event.id);
     },
 
     handleEvents(events) {
       this.currentEvents = events
     },
 
-    async addEventToDB(event) {
-      const res = await fetch('http://localhost:5000/events',{
-        method: 'POST',
-        headers: {
-          'Content-type': 'application/json',
-        },
-        body: JSON.stringify(event)
-      })
-      const data = await res.json()
-      this.events = [...this.events, data]
+    async updateEventDates(clickData){
+      let event = await this.getAllEvents()
+      let i = 0;
+      let temp;
+      //console.log(clickData)
+      for (; i < event.length; i++)
+      {
+        if (clickData.event.id == event[i].id)
+        {
+          event[i].start = clickData.event.startStr;
+          event[i].end = clickData.event.endStr;
+          temp = event[i]
+
+        }
+      }
+      //temp.text = this.text;
+      this.isModalVisible = false;
+
+     this.updateEventToDB(temp); //now we send our newly-constructed object to the DB, so it replaces what we were editing.
+
     },
 
     async updateEventToDB(clickInfo){
-       const res = await fetch(`http://localhost:5000/events/${clickInfo.event.id}`, {
-        method: 'PUT',
-        headers: {
-          'Content-type': 'application/json',
-        },
-        body: JSON.stringify(clickInfo)
-      })
-      const data = await res.json()
-      this.events = [...this.events, data]
+      //firebase
+      await updateEvent(clickInfo.id, clickInfo);
+      location.reload();        // refresh web page to show updated event details
     },
 
     // make modal visible
-    async showModal() {
+    // and update data that is shown in the notes modal
+    showModal() {
       this.isModalVisible = true;
-      let data;
-      data = await this.getEvents();
-      let i;
-      for (i = 0; i < data.length; i++)
-      {
-        if (data[i].id == clickData.event.id){
-          this.noteTitle = data[i].title;
-          this.message = data[i].extendedProps.text;
-          this.dateInfo =  data[i].start + " to " + data[i].end;
-        }
-      }
+      this.noteTitle = clickData.event.title
+      this.dateInfo = clickData.event.startStr + " to " + clickData.event.endStr
+      this.message = clickData.event.extendedProps.text
     },
 
     // close modal for taking notes
     // update any changes to the events from the notes modal
     async closeModal() {
-      let data, i, num;
-      this.isModalVisible = false;
-      data = await this.fetchEvents();
-      for (i = 0; i < data.length; i++){
-        if(data[i].id == clickData.event.id){
-          num = i;
+      let i = 0;
+      let event = await this.getAllEvents()
+      let temp;
+      //console.log(event)
+      for (; i < event.length; i++)
+      {
+        //console.log(event)
+        if (clickData.event.id == event[i].id)
+        {
+          event[i].text = this.message;
+          event[i].title = this.noteTitle;
+          temp = event[i]
+
         }
       }
-      data[num].event.title = this.noteTitle;
-      data[num].event.extendedProps.text = this.message;
-      this.updateEventToDB(data[num]);
-      location.reload();        // refresh web page to show updated event title
+      //temp.text = this.text;
+      //console.log(temp)
+      this.isModalVisible = false;
+
+      
+      this.updateEventToDB(temp); //now we send our newly-constructed object to the DB, so it replaces what we were editing.
     },
 
-    async getEvents(){
-      this.events = await this.fetchEvents();
-      main = [];
-      for(let i = 0; i < this.events.length; i++){ 
-         main.push(this.events[i].event);
-         if (this.events[i].id > idNum)
-         {
-           idNum = this.events[i].id;
-         }
+    async getAllEvents(){
+        const snapshot = await eventCollection.get()
+        this.events = snapshot.docs.map(doc => doc.data());
+        let temp = []
+        let i = 0
+        for (; i < this.events.length; i++){
+          if (this.events[i].email == user.email)
+          {
+            temp.push(this.events[i])
+          }
+        }
+        return temp;
       }
-      if (this.events.length > 0){
-        idNum++;
-      }
-      this.events = main;
-      return this.events;
-    },
-
-    async fetchEvents(){
-      const res = await fetch('http://localhost:5000/events')
-      const data = await res.json()
-      return data
-    },
-
-    async fetchEvent(id){
-      const res = await fetch(`http://localhost:5000/events/${id}`)
-      const data = await res.json()
-      return data
-    },
-  },
-  async created() {
-    this.events = await this.fetchEvents();
   },
 }
 </script>
