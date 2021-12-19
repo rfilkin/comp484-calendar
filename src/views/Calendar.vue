@@ -149,7 +149,7 @@ export default {
       alert('Error deleting event')
 
       //firebase
-      deleteEvent(id);
+      await deleteEvent(id);
     },
 
     handleEvents(events) {
