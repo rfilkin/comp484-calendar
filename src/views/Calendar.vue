@@ -11,7 +11,22 @@ import Navbar from '../views/Navbar.vue'
 import { onUnmounted, ref } from '@vue/runtime-core'
 
 var clickData;
-var user = firebase.auth().currentUser; //if someone is logged in, what is their username?
+let email;
+//let user = firebase.auth().currentUser; //if someone is logged in, what is their username?
+firebase.auth().onAuthStateChanged(function(user)
+{
+if (user != null)
+{
+  sessionStorage.setItem('email', user.email);        // store it in a session storage in case firebase messes up
+  email = user.email
+  //console.log(email, "1")
+}
+else{
+  email = sessionStorage.getItem('email');            // retrieve it from session storage ...
+  //console.log(email, "2")
+}
+});
+
 //firebase db
 const db = firebase.firestore();
 const eventCollection = db.collection('CalendarEvents'); //our data will be saved into this firebase collection
@@ -121,7 +136,7 @@ export default {
         end: selectInfo.endStr,
         allDay: selectInfo.allDay,
         text,
-        email: user.email
+        email: email
       })
       //firebase
       createEvent({
@@ -131,7 +146,7 @@ export default {
         end: selectInfo.endStr,
         allDay: selectInfo.allDay,
         text,
-        email: user.email
+        email: email
       })
     },
 
@@ -224,7 +239,7 @@ export default {
         let temp = []
         let i = 0
         for (; i < this.events.length; i++){
-          if (this.events[i].email == user.email)
+          if (this.events[i].email == email)
           {
             temp.push(this.events[i])
           }

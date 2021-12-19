@@ -29,10 +29,19 @@
       const name = ref("");
       
       onBeforeMount(() => {
-        const user = firebase.auth().currentUser; //if someone is logged in, what is their username?
-        if (user) {//if user exists...
+        //const user = firebase.auth().currentUser; //if someone is logged in, what is their username?
+        firebase.auth().onAuthStateChanged(function(user)
+        {
+        if (user != null)
+        {
+          if (user) {//if user exists...
           name.value = user.email.split('@')[0]; //split at the @ sign, and return first item in that list (the item before the @)
         }
+        }
+        else{
+          console.log("Error retrieving username...");
+        }
+        });
       });
 
       const Logout = () => {
