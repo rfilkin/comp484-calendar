@@ -15,7 +15,7 @@
       onBeforeMount(() => {
         firebase.auth().onAuthStateChanged((user) => { //if user goes from logged in to out, or vice versa
         if (route.path == "/"){
-          router.replace('/about'); //redirects user to about, if they are at home
+          router.replace('/calendar'); //redirects user to calendar, if they are at home
         } else if(!user && route.path == "/calendar"){
           router.replace('/login'); //redirects user to login, if they are NOT logged in and attempt to access calendar
         }else if (route.path == "/login" || route.path == "/register"){

@@ -12,8 +12,8 @@ import { onUnmounted, ref } from '@vue/runtime-core'
 
 var clickData;
 let email;
-//let user = firebase.auth().currentUser; //if someone is logged in, what is their username?
-firebase.auth().onAuthStateChanged(function(user)
+
+firebase.auth().onAuthStateChanged(function(user)     //if someone is logged in, what is their username?
 {
 if (user != null)
 {
@@ -23,6 +23,7 @@ if (user != null)
 }
 else{
   email = sessionStorage.getItem('email');            // retrieve it from session storage ...
+  console.log("Warning, retrieved user email from session storage!")
   //console.log(email, "2")
 }
 });
@@ -53,12 +54,12 @@ export const updateEvent = (id, event) => {
 // add error message for not being able to delete event
 export const deleteEvent = id => {
   var query = eventCollection.where('id', '==', id);
-  query.get().then(function(querySnapshot){
+  return query.get().then(function(querySnapshot){
     querySnapshot.forEach(function(doc){
       doc.ref.delete();
     })
   });
-  return 0;
+  // return 0;
 }
 
 export const useLoadEvents = () => {
@@ -185,17 +186,14 @@ export default {
 
         }
       }
-      //temp.text = this.text;
       this.isModalVisible = false;
 
      this.updateEventToDB(temp); //now we send our newly-constructed object to the DB, so it replaces what we were editing.
-
     },
 
     async updateEventToDB(clickInfo){
       //firebase
       await updateEvent(clickInfo.id, clickInfo);
-      location.reload();        // refresh web page to show updated event details
     },
 
     // make modal visible
@@ -211,6 +209,7 @@ export default {
     // update any changes to the events from the notes modal
     async closeModal() {
       let i = 0;
+      this.isModalVisible = false;
       let event = await this.getAllEvents()
       let temp;
       //console.log(event)
@@ -225,12 +224,8 @@ export default {
 
         }
       }
-      //temp.text = this.text;
-      //console.log(temp)
-      this.isModalVisible = false;
-
-      
-      this.updateEventToDB(temp); //now we send our newly-constructed object to the DB, so it replaces what we were editing.
+      await this.updateEventToDB(temp); //now we send our newly-constructed object to the DB, so it replaces what we were editing.
+      location.reload()
     },
 
     async getAllEvents(){
@@ -268,10 +263,10 @@ export default {
       <div class='demo-app-main'>
       <FullCalendar
       v-if="isModalVisible == false"
-      class='demo-app-calendar'
-      :options='calendarOptions'       
+      class ='demo-app-calendar'
+      :options='calendarOptions'   
       >
-        <template v-slot:eventContent='arg'>
+        <template v-slot:eventContent='arg' >
           <b>{{ arg.timeText }}</b>
           <i>{{ arg.event.title }}</i>
         </template>
