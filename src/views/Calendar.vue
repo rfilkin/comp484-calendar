@@ -8,6 +8,7 @@ import firebase from 'firebase'
 
 import NotesModal from '../views/NotesModal.vue'
 import Navbar from '../views/Navbar.vue'
+import Footer from '../views/Footer.vue'
 import { onUnmounted, ref } from '@vue/runtime-core'
 
 var clickData;
@@ -80,6 +81,7 @@ export default {
     FullCalendar,       // make the <FullCalendar> tag available, calendar component
     NotesModal,         // Pop up notes modal, fades calendar and navbar
     Navbar,            // Show navbar above calendar
+    Footer
   },
 
   data: function() {
@@ -272,6 +274,7 @@ export default {
         </template>
       </FullCalendar>
       </div>
+      <Footer />
   </div>
 </template>
 
