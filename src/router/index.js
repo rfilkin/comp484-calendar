@@ -4,14 +4,8 @@ import { createRouter, createWebHistory } from 'vue-router'
 const routes = [
   {
     path: '/',
-    name: 'About',
-    component: () => import( '../views/About.vue')
-  },
-  {
-    path: '/about',
-    name: 'About',
-   
-    component: () => import( '../views/About.vue')
+    name: 'Calendar',
+    component: () => import( '../views/Calendar.vue')
   },
   {
     path: '/login',
