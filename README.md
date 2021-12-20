@@ -1,5 +1,10 @@
 # vue-calendar-2
 
+## Project hosting link
+```
+https://calendarapp-2d231.web.app/login
+```
+
 ## Project setup
 ```
 npm install
@@ -10,9 +15,9 @@ npm install
 npm run serve
 ```
 
-### To run json server on localhost:5000
+### To deploy firebase app
 ```
-npm run backend
+npm run deploy
 ```
 
 ### Compiles and minifies for production
