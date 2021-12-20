@@ -39,7 +39,7 @@
 }
 
 .project-info{
-    padding-bottom: 10px;
+    padding-bottom: 15px;
 }
 
 .copyright{
@@ -48,6 +48,6 @@
 
 h2{
     padding-top: 25px;
-    padding-bottom: 20px;
+    padding-bottom: 15px;
 }
 </style>
