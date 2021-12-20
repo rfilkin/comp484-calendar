@@ -30,14 +30,14 @@ npm run lint
 See [Configuration Reference](https://cli.vuejs.org/config/).
 
 ### Sources used
-**Fullcalendar:**
+# Fullcalendar:
 Starter template for calendar page
 https://github.com/fullcalendar/fullcalendar-example-projects/tree/master/vue
 
 Tutorial on fullcalendar and vuejs
 https://www.youtube.com/watch?v=A-ESlbM-XzE&t=78s 
 
-**Vuejs:**
+# Vuejs:
 Tutorial on vue.js and CRUD operations with JSON server 
 https://www.youtube.com/watch?v=qZXt1Aom3Cs
 
@@ -47,7 +47,7 @@ https://www.digitalocean.com/community/tutorials/vuejs-vue-modal-component
 For passing props between components
 https://www.youtube.com/watch?v=PPmg7ntQjzc
 
-**Firebase:**
+# Firebase:
 Firebase and vue js tutorial CRUD operations
 https://www.youtube.com/watch?v=Htt8AKeF1Kw&t=361s
 
@@ -72,7 +72,7 @@ Storing and updating data
 Linking login form to firebase through Vue.js
 (https://www.youtube.com/watch?v=FMPHvxqDrVk)
 
-**UI:**
+# UI:
 Login/Signup page
 (https://www.positronx.io/create-login-signup-ui-screens-in-vue-js-with-bootstrap/)
 
