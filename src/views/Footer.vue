@@ -30,7 +30,7 @@
     background: #383838;
 }
 .footer{
-  height: 100px;
+  height: 120px;
   width: 100%;
   background: #383838;
   left: 0;

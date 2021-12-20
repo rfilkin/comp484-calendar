@@ -9,10 +9,9 @@ import firebase from 'firebase'
 import NotesModal from '../views/NotesModal.vue'
 import Navbar from '../views/Navbar.vue'
 import Footer from '../views/Footer.vue'
-import { onUnmounted, ref } from '@vue/runtime-core'
 
-var clickData;
-let email;
+var clickData;          // saving event objects
+var email;              // accessing user email 
 
 firebase.auth().onAuthStateChanged(function(user)     //if someone is logged in, what is their username?
 {
@@ -33,26 +32,22 @@ else{
 const db = firebase.firestore();
 const eventCollection = db.collection('CalendarEvents'); //our data will be saved into this firebase collection
 
+// after creating an event, add it to firebase
 export const createEvent = event => {
   return eventCollection.add(event);
 }
 
-export const getEvent = async id => {
-  const event = await eventCollection.doc(id).get();
-  return event.exists ? event.data() : null;
-}
-
+// for updating an event, whether user dragged event or changed note details
 export const updateEvent = (id, event) => {
   var query = eventCollection.where('id', '==', id);
-  query.get().then(function(querySnapshot){
+  return query.get().then(function(querySnapshot){
     querySnapshot.forEach(function(doc){
       doc.ref.update(event);
     })
   });
-  return eventCollection.doc(id).update(event);
 }
 
-// add error message for not being able to delete event
+// if an event is deleted
 export const deleteEvent = id => {
   var query = eventCollection.where('id', '==', id);
   return query.get().then(function(querySnapshot){
@@ -60,17 +55,6 @@ export const deleteEvent = id => {
       doc.ref.delete();
     })
   });
-  // return 0;
-}
-
-export const useLoadEvents = () => {
-  const events = ref([]);
-  const close = eventCollection.onSnapshot(snapshot => {
-    events.value = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }))
-  })
-  onUnmounted(close);
-  //console.log("useLoadEvents result: ", events.data());
-  return events;
 }
 
 
@@ -81,7 +65,7 @@ export default {
     FullCalendar,       // make the <FullCalendar> tag available, calendar component
     NotesModal,         // Pop up notes modal, fades calendar and navbar
     Navbar,            // Show navbar above calendar
-    Footer
+    Footer             // Footer component
   },
 
   data: function() {
@@ -122,17 +106,19 @@ export default {
   },
 
   methods: {
+    // In case I want to change weekends displaying or not
     handleWeekendsToggle() {
       this.calendarOptions.weekends = !this.calendarOptions.weekends // update a property
     },
 
+    // called when user clicks a new event
     handleDateSelect(selectInfo) {
       let title = ''; //add input from modal component for title
       let text = '';// = this.message;// take text from NotesModal
-      let temp = eventCollection.doc().id
+      let temp = eventCollection.doc().id   // this is an event id
       let calendarApi = selectInfo.view.calendar
       calendarApi.unselect() // clear date selection
-      calendarApi.addEvent({
+      calendarApi.addEvent({  // updates Fullcalendar component DOM
         id: temp,
         title,
         start: selectInfo.startStr,
@@ -141,8 +127,8 @@ export default {
         text,
         email: email
       })
-      //firebase
-      createEvent({
+      
+      createEvent({           // updates firebase
         id: temp,
         title,
         start: selectInfo.startStr,
@@ -163,16 +149,21 @@ export default {
      handleDeleteButton() {
       var clickInfo = clickData;    // retrieve event object, so I can delete it
       if (confirm(`Are you sure you want to delete the event '${clickInfo.event.title}'`)) {
-        clickInfo.event.remove()
-        this.closeModal();
+        console.log(clickInfo.event)
+        deleteEvent(clickInfo.event.id);
+        clickInfo.event.remove()        // firebase is buggy, this works
+        this.updateNotes()              // without this, deleted event doesn't delete
+        // this.closeModal();
       }
-      deleteEvent(clickInfo.event.id);
+      //location.reload()
     },
 
+    // default code from sample
     handleEvents(events) {
       this.currentEvents = events
     },
 
+    // if user drags event, go ahead and update firebase
     async updateEventDates(clickData){
       let event = await this.getAllEvents()
       let i = 0;
@@ -188,8 +179,6 @@ export default {
 
         }
       }
-      this.isModalVisible = false;
-
      this.updateEventToDB(temp); //now we send our newly-constructed object to the DB, so it replaces what we were editing.
     },
 
@@ -207,11 +196,10 @@ export default {
       this.message = clickData.event.extendedProps.text
     },
 
-    // close modal for taking notes
-    // update any changes to the events from the notes modal
-    async closeModal() {
+    // update note details to firebase
+    async updateNotes()
+    {
       let i = 0;
-      this.isModalVisible = false;
       let event = await this.getAllEvents()
       let temp;
       //console.log(event)
@@ -223,13 +211,23 @@ export default {
           event[i].text = this.message;
           event[i].title = this.noteTitle;
           temp = event[i]
-
         }
       }
-      await this.updateEventToDB(temp); //now we send our newly-constructed object to the DB, so it replaces what we were editing.
-      location.reload()
+      this.updateEventToDB(temp); //now we send our newly-constructed object to the DB, so it replaces what we were editing.
+      this.closeModal();
+      this.events = this.getAllEvents();
+      setTimeout(function(){      // let firebase update it, before refreshing page
+       window.location.reload();
+      }, 1000); 
     },
 
+    // close modal for taking notes
+    // update any changes to the events from the notes modal
+    async closeModal() {
+      this.isModalVisible = false;
+    },
+
+    // called on page refresh to get all calendar events and store in this.events
     async getAllEvents(){
         const snapshot = await eventCollection.get()
         this.events = snapshot.docs.map(doc => doc.data());
@@ -241,7 +239,8 @@ export default {
             temp.push(this.events[i])
           }
         }
-        return temp;
+        this.events = temp;
+        return this.events;
       }
   },
 }
@@ -251,7 +250,7 @@ export default {
   <div class='demo-app'>
       <NotesModal
             v-show = "isModalVisible"
-            @close = "closeModal"
+            @close = "updateNotes"
             @deleteEvent = "handleDeleteButton"
             :title = "noteTitle"
             :date = "dateInfo"
