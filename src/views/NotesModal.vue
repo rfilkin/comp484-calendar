@@ -147,8 +147,9 @@
   .btn-close {
     color: white;
     background: #0395b9;
-    border: 1px solid #0395b9;
+    border: 5px solid #0395b9;
     border-radius: 2px;
+    font-size: 14px;
   }
 
   #textBox{

@@ -9,11 +9,9 @@
             <a href="https://github.com/rfilkin/comp484-calendar" title = "Github" target="_blank" style="text-decoration:none">
             <i class="fab fa-github"></i> Github repo</a>
         </div>
-       <div class = "copyright">
         <p>Copyright 2021 by Brian Bales, Robert Filkin, Jozsef Feher, 
             Jericho Orcino, Charles Hernandez
         </p>
-        </div>
       </div>
     </div>
 </template>
@@ -28,26 +26,26 @@
     background: #383838;
 }
 .footer{
-  height: 130px;
-  width: 100%;
   background: #383838;
   left: 0;
   bottom: 0;
   text-align: center;
   color: white;
-  margin-bottom: 90px;
 }
 
 .project-info{
     padding-bottom: 15px;
 }
 
-.copyright{
-    margin-bottom: 20px;
+h2{
+    padding-top: 15px;
+    padding-bottom: 15px;
 }
 
-h2{
-    padding-top: 25px;
-    padding-bottom: 15px;
+.content-wrap{
+  max-width: 950px;
+  margin: 0 auto;
+  padding: 10px;
+  overflow: hidden;
 }
 </style>
