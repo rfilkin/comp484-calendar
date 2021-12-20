@@ -1,5 +1,5 @@
 <template>
-    <div class = "footer">
+    <div class = "footer" role="contentInfo">
     <div class = "content-wrap ">
         <h2>Calendar Application</h2>        
         <!-- Social media and contact links. Add or remove any networks. -->
@@ -49,7 +49,7 @@
 }
 
 h2{
-    padding-top: 10px;
+    padding-top: 25px;
     padding-bottom: 20px;
 }
 </style>
