@@ -63,7 +63,8 @@
                     .auth()
                     .createUserWithEmailAndPassword(email.value,password.value)
                     .then(user =>{
-                        alert(user);
+                        console.log(user) // do something with user to bypass unused variable
+                        alert("Welcome to the calendar app!");
                     })
                     .catch(err => alert(err.message));
             }
