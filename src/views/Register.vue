@@ -40,13 +40,20 @@
             </div>		
         </div>
     </div>
+    <Footer/>
 </template>
 
 <script>
     import firebase from 'firebase';
     import {ref} from 'vue';
+    import Footer from '../views/Footer.vue'
 
     export default{
+
+        components: {
+			Footer
+		},
+
         setup(){
             const email = ref("");
             const password = ref("");

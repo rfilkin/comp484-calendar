@@ -37,16 +37,24 @@
                 <span class="screen__background__shape screen__background__shape3"></span>		
                 <span class="screen__background__shape screen__background__shape2"></span>
                 <span class="screen__background__shape screen__background__shape1"></span>
-            </div>		
+            </div>
+			
         </div>
     </div>
+	<Footer/>
 </template>
 
 <script>
     import {ref} from 'vue';
     import firebase from 'firebase';
+	import Footer from '../views/Footer.vue'
 
     export default{
+
+		components: {
+			Footer
+		},
+
         setup(){
             const email = ref("");
             const password = ref("");
