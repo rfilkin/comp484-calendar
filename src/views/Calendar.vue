@@ -114,7 +114,7 @@ export default {
     // called when user clicks a new event
     handleDateSelect(selectInfo) {
       let title = ''; //add input from modal component for title
-      let text = '';// = this.message;// take text from NotesModal
+      let description = '';// = this.message;// take description from NotesModal
       let temp = eventCollection.doc().id   // this is an event id
       let calendarApi = selectInfo.view.calendar
       calendarApi.unselect() // clear date selection
@@ -124,7 +124,7 @@ export default {
         start: selectInfo.startStr,
         end: selectInfo.endStr,
         allDay: selectInfo.allDay,
-        text,
+        description,
         email: email
       })
       
@@ -134,7 +134,7 @@ export default {
         start: selectInfo.startStr,
         end: selectInfo.endStr,
         allDay: selectInfo.allDay,
-        text,
+        description,
         email: email
       })
     },
@@ -193,7 +193,7 @@ export default {
       this.isModalVisible = true;
       this.noteTitle = clickData.event.title
       this.dateInfo = clickData.event.startStr + " to " + clickData.event.endStr
-      this.message = clickData.event.extendedProps.text
+      this.message = clickData.event.extendedProps.description
     },
 
     // update note details to firebase
@@ -208,7 +208,7 @@ export default {
         //console.log(event)
         if (clickData.event.id == event[i].id)
         {
-          event[i].text = this.message;
+          event[i].description = this.message;
           event[i].title = this.noteTitle;
           temp = event[i]
         }
@@ -265,7 +265,8 @@ export default {
       <FullCalendar
       v-if="isModalVisible == false"
       class ='demo-app-calendar'
-      :options='calendarOptions'   
+      :options='calendarOptions'  
+      aria-label="Calendar events" 
       >
         <template v-slot:eventContent='arg' >
           <b>{{ arg.timeText }}</b>

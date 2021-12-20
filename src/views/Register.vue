@@ -21,12 +21,12 @@
                         <i class="register__icon fas fa-lock"></i>
                         <input type="password" class="register__input" placeholder="Password" v-model="password">
                     </div>
-                    <button class="button register__submit">
+                    <button class="button register__submit" aria-label="Sign up">
                         <span class="button__text">Sign Up Now</span>
                         <i class="button__icon fas fa-chevron-right"></i>
                     </button>
                 </form>
-                <button class="button goto__button"  @click="$router.push('login')">
+                <button class="button goto__button"  @click="$router.push('login')" aria-label="Login to existing account">
                     <span class="button__text">Have an account?<br/>Login Here</span>
                     <i class="button__icon fas fa-chevron-right"></i>
                 </button>	

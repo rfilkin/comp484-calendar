@@ -1,5 +1,5 @@
 <template>
-    <div class = "navbar">
+    <div class = "navbar" role = "banner">
         <h1 class = "welcomeMessage">Welcome, {{ name }}</h1>
         <button class = "logout"
             type="button"
