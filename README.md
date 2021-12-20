@@ -32,9 +32,11 @@ npm run lint
 See [Configuration Reference](https://cli.vuejs.org/config/).
 
 ## Sources used
-### Fullcalendar:
+### FullCalendar:
 Starter template for calendar page
 https://github.com/fullcalendar/fullcalendar-example-projects/tree/master/vue
+
+Vue component for FullCalendar https://fullcalendar.io/docs/vue 
 
 Tutorial on fullcalendar and vuejs
 https://www.youtube.com/watch?v=A-ESlbM-XzE&t=78s 
