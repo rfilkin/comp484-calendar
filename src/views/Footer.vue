@@ -10,7 +10,7 @@
             <i class="fab fa-github"></i> Github repo</a>
         </div>
         <p>Copyright 2021 by Brian Bales, Robert Filkin, Jozsef Feher, 
-            Jericho Orcino, Charles Hernandez
+            Jerrico Orcino, Charles Hernandez
         </p>
       </div>
     </div>
