@@ -168,13 +168,14 @@ export default {
       let event = await this.getAllEvents()
       let i = 0;
       let temp;
-      //console.log(clickData)
+      //console.log(clickData.event.allDay)
       for (; i < event.length; i++)
       {
         if (clickData.event.id == event[i].id)
         {
           event[i].start = clickData.event.startStr;
           event[i].end = clickData.event.endStr;
+          event[i].allDay = clickData.event.allDay;
           temp = event[i]
 
         }
