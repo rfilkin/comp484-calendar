@@ -38,7 +38,6 @@
                 <span class="screen__background__shape screen__background__shape2"></span>
                 <span class="screen__background__shape screen__background__shape1"></span>
             </div>
-			
         </div>
     </div>
 	<Footer/>
@@ -97,6 +96,10 @@ body {
 	align-items: center;
 	justify-content: center;
 	min-height: 100vh;
+}
+
+.footer{
+	margin-top: 120px;
 }
 
 .screen {		

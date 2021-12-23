@@ -101,6 +101,10 @@
         min-height: 100vh;
     }
 
+    .footer{
+        margin-top: 120px;
+    }
+
     .screen {		
         background: linear-gradient(90deg, #5D54A4, #7C78B8);		
         position: relative;	

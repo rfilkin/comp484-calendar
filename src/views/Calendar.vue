@@ -321,6 +321,7 @@ b { /* used for event dates/times */
 
 body {
     color: black;
+    background: #383838;
 }
 
 </style>

@@ -31,6 +31,7 @@
   bottom: 0;
   text-align: center;
   color: white;
+  margin-bottom: 0px;
 }
 
 .project-info{
